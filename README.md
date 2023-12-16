@@ -1,6 +1,6 @@
-#Synthetic Dataset Generation for Video Stabilization
+# Synthetic Dataset Generation for Video Stabilization
 
-I provide four different methods ['random', 'sampling', 'pca', 'gan'] for unstable video synthesis as described in my thesis ![placeHolder]
+I provide four different methods ['random', 'sampling', 'pca', 'gan'] for unstable video synthesis as described in my thesis.
 ![Example](https://github.com/btxviny/Synthetic-Dataset-Generation-for-Video-Stabilization/blob/main/result.gif)
 
 ## Instructions
