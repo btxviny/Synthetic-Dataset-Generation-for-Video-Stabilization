@@ -10,6 +10,7 @@ def parse_args():
     parser.add_argument('--method', type=str, help='generation method')
     parser.add_argument('--stable_path', type=str, help='Directory of stable videos')
     parser.add_argument('--unstable_path', type=str, help='Directory to generate unstable  videos')
+    parser.add_argument('--transforms_path', type=str, help='Directory to generate transforms')
     return parser.parse_args()
 
 def fixBorder(frame):
@@ -37,9 +38,12 @@ def crop_video(path):
     out.release()
 
 
-def generate(method,s_dir,out_dir):
+def generate(method,s_dir, out_dir, transform_dir):
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
+    if not os.path.exists(transform_dir):
+        os.makedirs(transform_dir)
+
     if method == 'random':
         script = './scripts/random_unstable.py'
     elif method == 'sampling':
@@ -55,9 +59,10 @@ def generate(method,s_dir,out_dir):
     for video in tqdm(videos):
         in_path = os.path.join(s_dir,video)
         out_path = os.path.join(out_dir,video)
-        subprocess.run(['python', script, '--in_path', in_path, '--out_path', out_path])
+        transform_path = os.path.join(transform_dir,video[:-4]+'.npy')
+        subprocess.run(['python', script, '--in_path', in_path, '--out_path', out_path,'--transforms_path',transform_path])
         crop_video(in_path) # crop original stable video to avoid perspective mismatch
 
 if __name__ == '__main__':
     args = parse_args()
-    generate(args.method, args.stable_path, args.unstable_path)
+    generate(args.method, args.stable_path, args.unstable_path, args.transforms_path)
