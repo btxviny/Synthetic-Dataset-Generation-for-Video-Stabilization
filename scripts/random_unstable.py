@@ -9,6 +9,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Video Stabilization using DMBVS-UNet')
     parser.add_argument('--in_path', type=str, help='Input video file path')
     parser.add_argument('--out_path', type=str, help='Output stabilized video file path')
+    parser.add_argument('--transforms_path', type=str, help='transforms file path')
     return parser.parse_args()
 
 def save_video(frames, path):
@@ -94,5 +95,6 @@ if __name__ == '__main__':
         img = frames[idx,...]
         mat = smooth_transforms[idx,...]
         unstable_frames[idx,...]  = cv2.warpPerspective(img,mat,(W,H))
+    np.save(args.transforms_path,smooth_transforms)
     save_video(unstable_frames,args.out_path)
     
