@@ -8,8 +8,9 @@ I provide four different methods ['random', 'sampling', 'pca', 'gan'] for unstab
 1. Gather the original stable videos from any online repository and place them in 'stable'.
 2.  - Run the following command:
        ```bash
-       python generate_dataset.py --method pca --stable_path ./stable/ --unstable_path ./unstable/
+       python generate_dataset.py --method pca --stable_path ./stable/ --unstable_path ./unstable/ --transforms_path ./transforms/
        ```
    - Chose any method from ['random', 'sampling', 'pca', 'gan'].
    - Replace `./stable/` with the path to your input stable videos.
    - Replace `./unstable/` with the directory you want the generated videos to be placed in.
+   - Replace `./transforms/` with the directory you want the transformations stable -> unstable to be placed in.
