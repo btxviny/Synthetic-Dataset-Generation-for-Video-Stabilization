@@ -14,6 +14,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Video Stabilization using DMBVS-UNet')
     parser.add_argument('--in_path', type=str, help='Input video file path')
     parser.add_argument('--out_path', type=str, help='Output stabilized video file path')
+    parser.add_argument('--transforms_path', type=str, help='transforms file path')
     return parser.parse_args()
 
 def save_video(frames, path):
@@ -129,5 +130,6 @@ if __name__ == '__main__':
     for i in range(1, len(transforms_noisy)):
         smooth_noise_transforms[i] = alpha * transforms_noisy[i] + (1 - alpha) * smooth_noise_transforms[i - 1]
     unstable_frames = warp_frames(frames,smooth_noise_transforms)
+    np.save(args.transforms_path,smooth_noise_transforms)
     save_video(unstable_frames,args.out_path)
     
