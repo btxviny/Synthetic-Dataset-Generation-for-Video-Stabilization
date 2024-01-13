@@ -12,13 +12,12 @@ def parse_args():
     parser.add_argument('--transforms_path', type=str, help='transforms file path')
     return parser.parse_args()
 
-def save_video(frames, path):
-    frame_count,h,w,_ = frames.shape
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter(path, fourcc, 30.0, (w,h))
-    for idx in range(frame_count):
-        out.write(frames[idx,...])
-    out.release()
+def fixBorder(frame):
+    s = frame.shape
+    # Scale the image 1% without moving the center
+    T = cv2.getRotationMatrix2D((s[1] / 2, s[0] / 2), 0, 1.1)
+    frame = cv2.warpAffine(frame, T, (s[1], s[0]))
+    return frame
 
 def get_transformation(shape):
     h,w, = shape
@@ -70,14 +69,7 @@ if __name__ == '__main__':
         exit()
     #load stable video
     cap = cv2.VideoCapture(args.in_path)
-    frames = []
-    while True:
-        ret,img = cap.read()
-        if not ret: break
-        img  = cv2.resize(img,(W,H))
-        frames.append(img)
-    frames = np.array(frames,dtype = np.uint8)
-    frame_count  = frames.shape[0]
+    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     #create transformations
     noisy_transforms = np.zeros((frame_count,3,3),dtype = np.float32)
     for idx in range(frame_count):
@@ -90,11 +82,16 @@ if __name__ == '__main__':
     for i in range(1, len(noisy_transforms)):
         smooth_transforms[i] = alpha * noisy_transforms[i] + (1 - alpha) * smooth_transforms[i - 1]
     #create unstable video
-    unstable_frames = np.zeros_like(frames)
-    for idx in range(1,frame_count-1):
-        img = frames[idx,...]
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    out = cv2.VideoWriter(args.out_path, fourcc, 30.0, (W,H))
+    for idx in range(frame_count):
+        ret,img = cap.read()
         mat = smooth_transforms[idx,...]
-        unstable_frames[idx,...]  = cv2.warpPerspective(img,mat,(W,H))
+        img = cv2.resize(img,(W,H))
+        img = cv2.warpPerspective(img,mat,(W,H))
+        img = fixBorder(img)
+        out.write(img)
+    out.release()
     np.save(args.transforms_path,smooth_transforms)
-    save_video(unstable_frames,args.out_path)
     
+E:\Datasets\Learning_DeepStab\stable\
